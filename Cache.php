@@ -1,6 +1,6 @@
 <?
 /**
-* PHP скрипт для полного сохранения веб-страницы с картинками, стилями, джаваскриптом, флэшем и т.д.
+* PHP СЃРєСЂРёРїС‚ РґР»СЏ РїРѕР»РЅРѕРіРѕ СЃРѕС…СЂР°РЅРµРЅРёСЏ РІРµР±-СЃС‚СЂР°РЅРёС†С‹ СЃ РєР°СЂС‚РёРЅРєР°РјРё, СЃС‚РёР»СЏРјРё, РґР¶Р°РІР°СЃРєСЂРёРїС‚РѕРј, С„Р»СЌС€РµРј Рё С‚.Рґ.
 * 
 * @version 1.0
 * @author Kirill Shaparov <kirill@shaparov.ru>
@@ -33,18 +33,18 @@ class Cache {
     ## VARIABLES ##########
     #######################
     
-	private   $name = ''							// Имя кэша
-			, $url = ''								// Кэшируемая страница
-			, $domen = ''							// Домен кэшируемой страницы
-			, $lastTag = ''							// Последний просматриваемый тег (для логов)
-			, $parentUrl = array()					// Последний полученный ресурс
-			, $resource = array()					// Список ресурсов
-			, $log = true							// Логировать ошибки
+	private   $name = ''							// РРјСЏ РєСЌС€Р°
+			, $url = ''								// РљСЌС€РёСЂСѓРµРјР°СЏ СЃС‚СЂР°РЅРёС†Р°
+			, $domen = ''							// Р”РѕРјРµРЅ РєСЌС€РёСЂСѓРµРјРѕР№ СЃС‚СЂР°РЅРёС†С‹
+			, $lastTag = ''							// РџРѕСЃР»РµРґРЅРёР№ РїСЂРѕСЃРјР°С‚СЂРёРІР°РµРјС‹Р№ С‚РµРі (РґР»СЏ Р»РѕРіРѕРІ)
+			, $parentUrl = array()					// РџРѕСЃР»РµРґРЅРёР№ РїРѕР»СѓС‡РµРЅРЅС‹Р№ СЂРµСЃСѓСЂСЃ
+			, $resource = array()					// РЎРїРёСЃРѕРє СЂРµСЃСѓСЂСЃРѕРІ
+			, $log = true							// Р›РѕРіРёСЂРѕРІР°С‚СЊ РѕС€РёР±РєРё
 			
-			, $quality = 'high'						// Качество кэширования [high, low]
+			, $quality = 'high'						// РљР°С‡РµСЃС‚РІРѕ РєСЌС€РёСЂРѕРІР°РЅРёСЏ [high, low]
 			
-			, $log_path = 'cache.log'				// Путь до логов
-			, $path = '/cache/';					// Путь до кэша
+			, $log_path = 'cache.log'				// РџСѓС‚СЊ РґРѕ Р»РѕРіРѕРІ
+			, $path = '/cache/';					// РџСѓС‚СЊ РґРѕ РєСЌС€Р°
 
 	
 	
@@ -56,7 +56,7 @@ class Cache {
     
 	public function __construct() {
 		
-		# 1. Создания хранилища кэша, если его еще нет
+		# 1. РЎРѕР·РґР°РЅРёСЏ С…СЂР°РЅРёР»РёС‰Р° РєСЌС€Р°, РµСЃР»Рё РµРіРѕ РµС‰Рµ РЅРµС‚
 		if(!is_dir(getenv("DOCUMENT_ROOT").$this->path)) {
             mkdir(getenv("DOCUMENT_ROOT").$this->path);
         }
@@ -66,52 +66,52 @@ class Cache {
 	
 	
 	/**
-	* Создать кэш страницы
+	* РЎРѕР·РґР°С‚СЊ РєСЌС€ СЃС‚СЂР°РЅРёС†С‹
 	* 
-	* @param string название кэша
-	* @param string ссылка на страницу сайта, которую надо закешировать
+	* @param string РЅР°Р·РІР°РЅРёРµ РєСЌС€Р°
+	* @param string СЃСЃС‹Р»РєР° РЅР° СЃС‚СЂР°РЅРёС†Сѓ СЃР°Р№С‚Р°, РєРѕС‚РѕСЂСѓСЋ РЅР°РґРѕ Р·Р°РєРµС€РёСЂРѕРІР°С‚СЊ
 	*/
 	public function create($name, $url) {		
 		
-		if(!preg_match("/^[0-9a-z-_]+$/i",$name)) { $this->log("ERROR: ".$this->message(1), $name); return false; } 			// проверим название
-		if(!preg_match("|^([^/]*(//)*[^/]+)|i",$url, $match)) { $this->log("ERROR: ".$this->message(2), $url); return false; }		// проверим домен
+		if(!preg_match("/^[0-9a-z-_]+$/i",$name)) { $this->log("ERROR: ".$this->message(1), $name); return false; } 			// РїСЂРѕРІРµСЂРёРј РЅР°Р·РІР°РЅРёРµ
+		if(!preg_match("|^([^/]*(//)*[^/]+)|i",$url, $match)) { $this->log("ERROR: ".$this->message(2), $url); return false; }		// РїСЂРѕРІРµСЂРёРј РґРѕРјРµРЅ
 		
 		$this->domen = $match[2];
 		$this->name = $name;
 		$this->url = $url;
 		$this->resource = array();
 		
-		# 0. Проверяем есть ли уже кэш
+		# 0. РџСЂРѕРІРµСЂСЏРµРј РµСЃС‚СЊ Р»Рё СѓР¶Рµ РєСЌС€
 		$f = glob(getenv("DOCUMENT_ROOT").$this->path.$this->name.'.*',GLOB_NOSORT);
 		if(count($f)) { $this->log("ERROR: ".$this->message(0), $this->path.basename($f[0])); return false; }
 		
-		# 1. Получить страницу
+		# 1. РџРѕР»СѓС‡РёС‚СЊ СЃС‚СЂР°РЅРёС†Сѓ
 		list($header, $body) = $this->connect($url);        
 		
 		
-		// Если тело пустое
+		// Р•СЃР»Рё С‚РµР»Рѕ РїСѓСЃС‚РѕРµ
 		if(empty($body)) return false;		
 				
-		# 2. Определяем кодировку страницы и тип файла
+		# 2. РћРїСЂРµРґРµР»СЏРµРј РєРѕРґРёСЂРѕРІРєСѓ СЃС‚СЂР°РЅРёС†С‹ Рё С‚РёРї С„Р°Р№Р»Р°
 		foreach($header as $v) {
 			
-			// Тип файла 
+			// РўРёРї С„Р°Р№Р»Р° 
 			if(!preg_match("/^Content-type: ([^;]+)/i", $v, $match)) continue;
 			$ext = $this->getExt($match[1], $url);
 			
-			// Разновидность типа (text, image)
+			// Р Р°Р·РЅРѕРІРёРґРЅРѕСЃС‚СЊ С‚РёРїР° (text, image)
 			$type = explode('/',$match[1]);
 			
 			switch($type[0]) {
 				case 'text':
 					
-					// папка создается только для определенного типа файлов
+					// РїР°РїРєР° СЃРѕР·РґР°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РґР»СЏ РѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ С‚РёРїР° С„Р°Р№Р»РѕРІ
 					if(in_array($ext,array('html','shtml','htm','xml','css'))) {						
-						// создаем папку для дополнительных ресурсов
+						// СЃРѕР·РґР°РµРј РїР°РїРєСѓ РґР»СЏ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С… СЂРµСЃСѓСЂСЃРѕРІ
 				        if(!is_dir(getenv("DOCUMENT_ROOT").$this->path.$this->name)) mkdir(getenv("DOCUMENT_ROOT").$this->path.$this->name);        
 					}
 					
-					// Кодировка страницы  
+					// РљРѕРґРёСЂРѕРІРєР° СЃС‚СЂР°РЅРёС†С‹  
 					if(preg_match("/^Content-type: [^;]+; charset=([a-z0-9-]+)/i", $v, $match)) $charset = $match[1];								
 				break;
 				
@@ -127,10 +127,10 @@ class Cache {
 			break;
 		}
 		
-		// Не определен тип файла
+		// РќРµ РѕРїСЂРµРґРµР»РµРЅ С‚РёРї С„Р°Р№Р»Р°
 		if(!$ext) { $this->log( "Error: undefined extension", $url ); return false; }
 		
-		// Не определена кодировка
+		// РќРµ РѕРїСЂРµРґРµР»РµРЅР° РєРѕРґРёСЂРѕРІРєР°
 		if(!$charset) { 
 			if(!($charset = mb_detect_encoding($body, array('UTF-8', 'Windows-1251')))) {
 				$this->log( "Error: undefined charset", $url ); 
@@ -138,58 +138,58 @@ class Cache {
 			}			
 		}
 		
-		// Если кодировка не UTF-8, перекодируем контент
+		// Р•СЃР»Рё РєРѕРґРёСЂРѕРІРєР° РЅРµ UTF-8, РїРµСЂРµРєРѕРґРёСЂСѓРµРј РєРѕРЅС‚РµРЅС‚
 		if($charset != 'UTF-8') {
 			
 			$temp_body = iconv($charset,'UTF-8//TRANSLIT',$body);
 			if($temp_body) $body = $temp_body;
 			else $body = iconv('Windows-1251','UTF-8//TRANSLIT',$body);
 			
-			$body = preg_replace_callback("/<meta([^>]+)>/mi", array($this, 'changeCharset'), $body); // меняем кодировку в документе, чтобы правильно отработал domDocument
+			$body = preg_replace_callback("/<meta([^>]+)>/mi", array($this, 'changeCharset'), $body); // РјРµРЅСЏРµРј РєРѕРґРёСЂРѕРІРєСѓ РІ РґРѕРєСѓРјРµРЅС‚Рµ, С‡С‚РѕР±С‹ РїСЂР°РІРёР»СЊРЅРѕ РѕС‚СЂР°Р±РѕС‚Р°Р» domDocument
 		}
 		
 		
-		// создаем новый dom-объект
+		// СЃРѕР·РґР°РµРј РЅРѕРІС‹Р№ dom-РѕР±СЉРµРєС‚
 	    $dom = new domDocument;
 
-	    // загружаем html в объект
+	    // Р·Р°РіСЂСѓР¶Р°РµРј html РІ РѕР±СЉРµРєС‚
 	    @$dom->loadHTML($body);
 	    
-		# 3. Узнаем полный базовый адрес документа
+		# 3. РЈР·РЅР°РµРј РїРѕР»РЅС‹Р№ Р±Р°Р·РѕРІС‹Р№ Р°РґСЂРµСЃ РґРѕРєСѓРјРµРЅС‚Р°
 		$base = $dom->documentElement->getElementsByTagName('base');
 		foreach ($base as $val) {
 			
-			// Модифицируем путь до файлов
+			// РњРѕРґРёС„РёС†РёСЂСѓРµРј РїСѓС‚СЊ РґРѕ С„Р°Р№Р»РѕРІ
 			$this->domen = $val->getAttribute('href');			
 			
-			// Удаляем последний слэш, по ресурсам это выгодней, такие пути чаще встречаются /img/n.gif			
+			// РЈРґР°Р»СЏРµРј РїРѕСЃР»РµРґРЅРёР№ СЃР»СЌС€, РїРѕ СЂРµСЃСѓСЂСЃР°Рј СЌС‚Рѕ РІС‹РіРѕРґРЅРµР№, С‚Р°РєРёРµ РїСѓС‚Рё С‡Р°С‰Рµ РІСЃС‚СЂРµС‡Р°СЋС‚СЃСЏ /img/n.gif			
 			$this->domen = preg_replace("|/$|", '', $this->domen);
 			
-			// Удаляем base
+			// РЈРґР°Р»СЏРµРј base
 			if($this->quality == 'low') $this->deleteNode($val); 
 		}
 	    
-		# 4. Ссылки (Модифицируем, чтобы относительные адреса не ссылались на кэш)
+		# 4. РЎСЃС‹Р»РєРё (РњРѕРґРёС„РёС†РёСЂСѓРµРј, С‡С‚РѕР±С‹ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹Рµ Р°РґСЂРµСЃР° РЅРµ СЃСЃС‹Р»Р°Р»РёСЃСЊ РЅР° РєСЌС€)
 		if($this->quality == 'low') {
 			$a = $dom->getElementsByTagName('a');
 			foreach ($a as $i=>$val) {
 				if(!$val->getAttribute('href')) continue;
 				
-				if(!preg_match("|^/|i",$val->getAttribute('href'))) continue; // если начинается со слэша
+				if(!preg_match("|^/|i",$val->getAttribute('href'))) continue; // РµСЃР»Рё РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃРѕ СЃР»СЌС€Р°
 				
 				$val->setAttribute('href',$this->domen.$val->getAttribute('href'));
 			}
 		}
 		
-	    # 4. Изображения
+	    # 4. РР·РѕР±СЂР°Р¶РµРЅРёСЏ
 	    $img = $dom->getElementsByTagName('img');
 		foreach ($img as $i=>$val) {
 			$this->lastTag = 'img #'.$i;
-			if($val->getAttribute('src')) $val->setAttribute('src',$this->getSource($val->getAttribute('src')));				# обычное изображение
+			if($val->getAttribute('src')) $val->setAttribute('src',$this->getSource($val->getAttribute('src')));				# РѕР±С‹С‡РЅРѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ
 			if($val->getAttribute('data-thumb')) $val->setAttribute('src',$this->getSource($val->getAttribute('data-thumb')));	# youtube.com
 		}
 		
-		# 5. Стили, фавиконка
+		# 5. РЎС‚РёР»Рё, С„Р°РІРёРєРѕРЅРєР°
 		$link = $dom->getElementsByTagName('link');
 		foreach ($link as $i=>$val) {
 			if(!$val->getAttribute('href')) continue;
@@ -197,21 +197,21 @@ class Cache {
 			if(in_array($val->getAttribute('rel'), array('shortcut icon','stylesheet'))) $val->setAttribute('href',$this->getSource($val->getAttribute('href')));
 		} 
 		
-		# 7. Объект
+		# 7. РћР±СЉРµРєС‚
 		$object = $dom->getElementsByTagName('object');
 		foreach ($object as $i=>$val) {
 			$this->lastTag = 'object #'.$i;
 			if($val->getAttribute('data')) $val->setAttribute('data',$this->getSource($val->getAttribute('data')));
 		} 
 					
-		# 7. Апплеты
+		# 7. РђРїРїР»РµС‚С‹
 		$applet = $dom->getElementsByTagName('applet');
 		foreach ($applet as $i=>$val) {
 			$this->lastTag = 'applet #'.$i;
 			if($val->getAttribute('code')) $val->setAttribute('code',$this->getSource($val->getAttribute('code')));
 		} 
 				
-		# 7. Видео
+		# 7. Р’РёРґРµРѕ
 		$video = $dom->getElementsByTagName('video');
 		foreach ($video as $i=>$val) {
 			$this->lastTag = 'video #'.$i;
@@ -219,7 +219,7 @@ class Cache {
 			if($val->getAttribute('src')) $val->setAttribute('src',$this->getSource($val->getAttribute('src')));
 		} 
 			
-		# 7. Видео
+		# 7. Р’РёРґРµРѕ
 		$param = $dom->getElementsByTagName('param');
 		foreach ($param as $i=>$val) {
 			if(!in_array($val->getAttribute('name'),array('movie','base'))) continue;
@@ -228,7 +228,7 @@ class Cache {
 			$val->setAttribute('value',$this->getSource($val->getAttribute('value')));
 		} 
 		
-		// список тегов из которых надо получить ресурсы		
+		// СЃРїРёСЃРѕРє С‚РµРіРѕРІ РёР· РєРѕС‚РѕСЂС‹С… РЅР°РґРѕ РїРѕР»СѓС‡РёС‚СЊ СЂРµСЃСѓСЂСЃС‹		
 		$tags = array('audio', 'embed', 'source', 'frame', 'script', 'iframe');		
 		
 		foreach($tags as $v) {				
@@ -242,10 +242,10 @@ class Cache {
 				
 				
 				
-		# 7. Согласно качеству преобразуем объект в строку
+		# 7. РЎРѕРіР»Р°СЃРЅРѕ РєР°С‡РµСЃС‚РІСѓ РїСЂРµРѕР±СЂР°Р·СѓРµРј РѕР±СЉРµРєС‚ РІ СЃС‚СЂРѕРєСѓ
 		switch($this->quality) {
 			case 'high':
-				$body = preg_replace("/<base[^>]+>/mi",'',$body); // удаляем base		
+				$body = preg_replace("/<base[^>]+>/mi",'',$body); // СѓРґР°Р»СЏРµРј base		
 			break;
 			
 			
@@ -254,23 +254,23 @@ class Cache {
 			break;
 		}
 		
-		// Получаем ресурсы из css
+		// РџРѕР»СѓС‡Р°РµРј СЂРµСЃСѓСЂСЃС‹ РёР· css
 		$body = $this->getSourceFromCSS($body,$url);
 				
 		if($this->quality == 'high') {
-			// заменяем все ресурсы
+			// Р·Р°РјРµРЅСЏРµРј РІСЃРµ СЂРµСЃСѓСЂСЃС‹
 			foreach($this->resource as $val) {				
 				$body = str_replace(array("'".$val['true-path']."'","\"".$val['true-path']."\""),'"'.$val['new-name'].'"',$body);
 			}			
 			
-			// Меняем относительные ссылки на постоянные, чтобы они вели не на мой сайт
+			// РњРµРЅСЏРµРј РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹Рµ СЃСЃС‹Р»РєРё РЅР° РїРѕСЃС‚РѕСЏРЅРЅС‹Рµ, С‡С‚РѕР±С‹ РѕРЅРё РІРµР»Рё РЅРµ РЅР° РјРѕР№ СЃР°Р№С‚
 			$body = preg_replace_callback("|(<a[^>]+)|mi", array($this, 'changeHREF'), $body);
 			
-			// Обрабатываем conditional comments
+			// РћР±СЂР°Р±Р°С‚С‹РІР°РµРј conditional comments
 			$body = preg_replace_callback("/<!--\[if\s(?:[^<]+|<(?!!\[endif\]-->))*<!\[endif\]-->/mi", array($this, 'conditionalComments'), $body);
 		}		
 			 
-		# 10. Сохраняем страницу
+		# 10. РЎРѕС…СЂР°РЅСЏРµРј СЃС‚СЂР°РЅРёС†Сѓ
 		file_put_contents(getenv("DOCUMENT_ROOT").$this->path.$this->name.'.'.$ext, $body);
 		
 		return true;
@@ -284,46 +284,46 @@ class Cache {
     #######################    
 	
 	/**
-	* Перебор все сторонних ресурсов в теле страницы и выкачка их на сервер
+	* РџРµСЂРµР±РѕСЂ РІСЃРµ СЃС‚РѕСЂРѕРЅРЅРёС… СЂРµСЃСѓСЂСЃРѕРІ РІ С‚РµР»Рµ СЃС‚СЂР°РЅРёС†С‹ Рё РІС‹РєР°С‡РєР° РёС… РЅР° СЃРµСЂРІРµСЂ
 	* 
-	* @param string ссылка на ресурс
-	* @return string ссылка на локальный ресурс
+	* @param string СЃСЃС‹Р»РєР° РЅР° СЂРµСЃСѓСЂСЃ
+	* @return string СЃСЃС‹Р»РєР° РЅР° Р»РѕРєР°Р»СЊРЅС‹Р№ СЂРµСЃСѓСЂСЃ
 	*/
 	private function getSource($true_url) {		
 		
-		// Приводим путь к нормальному виду
+		// РџСЂРёРІРѕРґРёРј РїСѓС‚СЊ Рє РЅРѕСЂРјР°Р»СЊРЅРѕРјСѓ РІРёРґСѓ
 		if(false === ($url = $this->changeAbsoluteURL($true_url))) return $true_url;
 		
-		// Старый адрес повторяется
+		// РЎС‚Р°СЂС‹Р№ Р°РґСЂРµСЃ РїРѕРІС‚РѕСЂСЏРµС‚СЃСЏ
 		foreach($this->resource as $v) if($v['old-path'] == $url) return $v['new-name'];
 		
-		// Получаем ресурс
+		// РџРѕР»СѓС‡Р°РµРј СЂРµСЃСѓСЂСЃ
 		list($header, $body) = $this->connect( $url );
 		
-		// Если тело пустое
+		// Р•СЃР»Рё С‚РµР»Рѕ РїСѓСЃС‚РѕРµ
 		if(empty($body)) return $url;		
 				
-		// Из заголовков узнаем расширение
+		// РР· Р·Р°РіРѕР»РѕРІРєРѕРІ СѓР·РЅР°РµРј СЂР°СЃС€РёСЂРµРЅРёРµ
 		foreach($header as $v) {
 			if(preg_match("/^Content-type: (.+)/i", $v, $match)) $ext = $this->getExt($match[1], $url);
 		}
 		
-		// Content-type не определен
+		// Content-type РЅРµ РѕРїСЂРµРґРµР»РµРЅ
 		if(empty($ext)) {
 			$this->log('ERROR: no Content-type', $url);
 			return $url;
 		}
 		
-		// Неизвестный формат
+		// РќРµРёР·РІРµСЃС‚РЅС‹Р№ С„РѕСЂРјР°С‚
 		if(!$ext) return $url;
 		
-		// Если это стиль, то пытаемся извлечь из него ресурсы
+		// Р•СЃР»Рё СЌС‚Рѕ СЃС‚РёР»СЊ, С‚Рѕ РїС‹С‚Р°РµРјСЃСЏ РёР·РІР»РµС‡СЊ РёР· РЅРµРіРѕ СЂРµСЃСѓСЂСЃС‹
 		if(in_array($ext, array('css','htm','html','xml'))) $body = $this->getSourceFromCSS($body,$url);
 		
-		// Новое название ресурса
+		// РќРѕРІРѕРµ РЅР°Р·РІР°РЅРёРµ СЂРµСЃСѓСЂСЃР°
 		$new_path = $this->path.$this->name.'/'.count($this->resource).'.'.$ext;
 		
-		// Записываем ресурс в папку
+		// Р—Р°РїРёСЃС‹РІР°РµРј СЂРµСЃСѓСЂСЃ РІ РїР°РїРєСѓ
 		file_put_contents(getenv("DOCUMENT_ROOT").$new_path, $body);
 		
 		$this->resource[] = array(
@@ -337,7 +337,7 @@ class Cache {
 	
 	
 	/**
-	* Получение ресурсов из css
+	* РџРѕР»СѓС‡РµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ РёР· css
 	* 
 	* @param mixed $body
 	* @param mixed $url
@@ -346,10 +346,10 @@ class Cache {
 	private function getSourceFromCSS( $body, $url ) {
 		
 		/*
-		//TODO: 5.3.0 - Появление анонимных функций.
+		//TODO: 5.3.0 - РџРѕСЏРІР»РµРЅРёРµ Р°РЅРѕРЅРёРјРЅС‹С… С„СѓРЅРєС†РёР№.
 		$callback = function( $matches ) use ( $url ) {
 			
-			//TODO: 5.4.0 - Стало возможным использовать $this в анонимных функциях.
+			//TODO: 5.4.0 - РЎС‚Р°Р»Рѕ РІРѕР·РјРѕР¶РЅС‹Рј РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ $this РІ Р°РЅРѕРЅРёРјРЅС‹С… С„СѓРЅРєС†РёСЏС….
 			$this->getUrlSource($matches, $url);			
 	    }; 
 		
@@ -357,19 +357,19 @@ class Cache {
 		$body = preg_replace_callback("|(@import)[ ]*([^ ]+)|mi", $callback, $body);
 		*/		
 		
-		# 1. Запоминаем ссылку не ресурс относительного которого мы будем получать следующие файлы
+		# 1. Р—Р°РїРѕРјРёРЅР°РµРј СЃСЃС‹Р»РєСѓ РЅРµ СЂРµСЃСѓСЂСЃ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕРіРѕ РєРѕС‚РѕСЂРѕРіРѕ РјС‹ Р±СѓРґРµРј РїРѕР»СѓС‡Р°С‚СЊ СЃР»РµРґСѓСЋС‰РёРµ С„Р°Р№Р»С‹
 		array_push($this->parentUrl,$url);
 		 
-		# 2. Ресурсы с указанным url: img, @import url()		
+		# 2. Р РµСЃСѓСЂСЃС‹ СЃ СѓРєР°Р·Р°РЅРЅС‹Рј url: img, @import url()		
 		$body = preg_replace_callback("|(url)\(([^)]+)\)|mi", array($this, 'getUrlSource'), $body);
 		 		 
-		# 3. Ресурсы без url: @import		
+		# 3. Р РµСЃСѓСЂСЃС‹ Р±РµР· url: @import		
 		$body = preg_replace_callback("|(@import)[ ]*([^ ]+)|mi", array($this, 'getUrlSource'), $body);
 		
-		# 4. Атрибут <td valign="top" background="images/enter_bg.jpg">		
+		# 4. РђС‚СЂРёР±СѓС‚ <td valign="top" background="images/enter_bg.jpg">		
 		$body = preg_replace_callback("|(background)[ ]*=[ ]*\"([^\"]+)|mi", array($this, 'getUrlSource'), $body);
 		
-		# 5. Удаляем ссылку на ресурс
+		# 5. РЈРґР°Р»СЏРµРј СЃСЃС‹Р»РєСѓ РЅР° СЂРµСЃСѓСЂСЃ
 		array_pop($this->parentUrl);
 		
 		return $body;
@@ -378,7 +378,7 @@ class Cache {
 	
 	
 	/**
-	* Меняем в документе кодировку на UTF-8 для правильной работы domDocument
+	* РњРµРЅСЏРµРј РІ РґРѕРєСѓРјРµРЅС‚Рµ РєРѕРґРёСЂРѕРІРєСѓ РЅР° UTF-8 РґР»СЏ РїСЂР°РІРёР»СЊРЅРѕР№ СЂР°Р±РѕС‚С‹ domDocument
 	* 
 	* @param array 
 	* @return string
@@ -391,7 +391,7 @@ class Cache {
 	
 	
 	/**
-	* Меняем относительные ссылки на постоянные, чтобы они вели не на кэш
+	* РњРµРЅСЏРµРј РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹Рµ СЃСЃС‹Р»РєРё РЅР° РїРѕСЃС‚РѕСЏРЅРЅС‹Рµ, С‡С‚РѕР±С‹ РѕРЅРё РІРµР»Рё РЅРµ РЅР° РєСЌС€
 	* 
 	* @param mixed $p
 	* @return mixed
@@ -407,20 +407,20 @@ class Cache {
 	
 	
 	/**
-	* Сохранение ресурсов из условных комментариев
+	* РЎРѕС…СЂР°РЅРµРЅРёРµ СЂРµСЃСѓСЂСЃРѕРІ РёР· СѓСЃР»РѕРІРЅС‹С… РєРѕРјРјРµРЅС‚Р°СЂРёРµРІ
 	* 
 	* @param mixed $p
 	* @return mixed
 	*/
 	private function conditionalComments($p) {
 		
-		# 1. Изображения
+		# 1. РР·РѕР±СЂР°Р¶РµРЅРёСЏ
 		$p[0] = preg_replace_callback("|<(img)([^>]+)|mi", array($this, 'getUrlSource'), $p[0]); 
 
-		# 2. Стили
+		# 2. РЎС‚РёР»Рё
 		$p[0] = preg_replace_callback("|<(link)([^>]+)|mi", array($this, 'getUrlSource'), $p[0]);
 
-		# 3. Джаваскрипт
+		# 3. Р”Р¶Р°РІР°СЃРєСЂРёРїС‚
 		$p[0] = preg_replace_callback("|<(script)([^>]+)|mi", array($this, 'getUrlSource'), $p[0]);
 		
 		return $p[0];
@@ -428,7 +428,7 @@ class Cache {
 	
 	
 	/**
-	* Получение ресурса для url() подобия
+	* РџРѕР»СѓС‡РµРЅРёРµ СЂРµСЃСѓСЂСЃР° РґР»СЏ url() РїРѕРґРѕР±РёСЏ
 	* 
 	* @param array $p
 	* @return string
@@ -437,33 +437,33 @@ class Cache {
 		
 		switch($p[1]) {
 			
-			# 1. Изображения
+			# 1. РР·РѕР±СЂР°Р¶РµРЅРёСЏ
 			case 'img': 
 				if(!preg_match("|src=\"([^\"]+)\"|", $p[2], $m)) return $p[0];
 				$url = $m[1];
 			break;
 			
-			# 2. Стили
+			# 2. РЎС‚РёР»Рё
 			case 'link': 
 				if(!preg_match("|href=\"([^\"]+)\"|", $p[2], $m)) return $p[0];
 				$url = $m[1];
 			break;
 			
-			# 3. Джаваскрипт
+			# 3. Р”Р¶Р°РІР°СЃРєСЂРёРїС‚
 			case 'script': 
 				if(!preg_match("|src=\"([^\"]+)\"|", $p[2], $m)) return $p[0];
 				$url = $m[1];
 			break;
 			
-			# 1. Ресурсы внутри css
+			# 1. Р РµСЃСѓСЂСЃС‹ РІРЅСѓС‚СЂРё css
 			case 'url':
 				$this->lastTag = 'style url()';
 				$url = $p[2];				
 			break;
 			
-			# 2. Подключаемые ресурсы без url()
+			# 2. РџРѕРґРєР»СЋС‡Р°РµРјС‹Рµ СЂРµСЃСѓСЂСЃС‹ Р±РµР· url()
 			case '@import':
-				if(preg_match("/^url\(/",$p[2])) return $p[0]; // Это все-таки url()
+				if(preg_match("/^url\(/",$p[2])) return $p[0]; // Р­С‚Рѕ РІСЃРµ-С‚Р°РєРё url()
 				$this->lastTag = 'style @import';
 				$url = $p[2];
 			break;
@@ -473,7 +473,7 @@ class Cache {
 			break;
 		}
 		
-		$url = str_replace(array("'","\"","`"),'',$url); // избавляемся от кавычек
+		$url = str_replace(array("'","\"","`"),'',$url); // РёР·Р±Р°РІР»СЏРµРјСЃСЏ РѕС‚ РєР°РІС‹С‡РµРє
 		
 		return str_replace($url, $this->getSource($url), $p[0]);
 	}
@@ -481,24 +481,24 @@ class Cache {
 	
 	
 	/**
-	* Заменяем относительный путь на абсолютный
+	* Р—Р°РјРµРЅСЏРµРј РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹Р№ РїСѓС‚СЊ РЅР° Р°Р±СЃРѕР»СЋС‚РЅС‹Р№
 	* 
-	* @param string путь
+	* @param string РїСѓС‚СЊ
 	*/
 	private function changeAbsoluteURL( $url ) {
 		
-		// Повторяющиеся урлы не проверяем
+		// РџРѕРІС‚РѕСЂСЏСЋС‰РёРµСЃСЏ СѓСЂР»С‹ РЅРµ РїСЂРѕРІРµСЂСЏРµРј
 		foreach($this->resource as $v) if($v['new-name'] == $url) return false;		
 		
-		if(preg_match("/^data:/", $url)) return false; 						# кодированное изображение								data:image/png;base64
-		elseif(preg_match("/^#/", $url)) return false; 						# хэштек, цвет											#load
-		elseif(preg_match("|^//|",$url)) return substr($url,2);				# путь относительно схемы								//yandex.ru/img/i.png
-		elseif(preg_match("|^/|",$url))  return $this->domen.$url;			# путь локальный										/includes/templates/tehnostudio_ru/js/PIE.htc
-		elseif(preg_match("|^[a-z0-9]+://|i",$url)) return $url; 			# путь абсолютный										http://tehnostudio.ru/includes/templates/tehnostudio_ru/js/PIE.htc
-		elseif(preg_match("|^[^./]+|",$url)) {								# путь относительно корня сайта							iepngfix.htc
+		if(preg_match("/^data:/", $url)) return false; 						# РєРѕРґРёСЂРѕРІР°РЅРЅРѕРµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ								data:image/png;base64
+		elseif(preg_match("/^#/", $url)) return false; 						# С…СЌС€С‚РµРє, С†РІРµС‚											#load
+		elseif(preg_match("|^//|",$url)) return substr($url,2);				# РїСѓС‚СЊ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ СЃС…РµРјС‹								//yandex.ru/img/i.png
+		elseif(preg_match("|^/|",$url))  return $this->domen.$url;			# РїСѓС‚СЊ Р»РѕРєР°Р»СЊРЅС‹Р№										/includes/templates/tehnostudio_ru/js/PIE.htc
+		elseif(preg_match("|^[a-z0-9]+://|i",$url)) return $url; 			# РїСѓС‚СЊ Р°Р±СЃРѕР»СЋС‚РЅС‹Р№										http://tehnostudio.ru/includes/templates/tehnostudio_ru/js/PIE.htc
+		elseif(preg_match("|^[^./]+|",$url)) {								# РїСѓС‚СЊ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РєРѕСЂРЅСЏ СЃР°Р№С‚Р°							iepngfix.htc
 			if(count($this->parentUrl)){				
 				
-				if(!preg_match("|^([^/]*//[^/]+)|i",$this->array_last($this->parentUrl), $match)) { $this->log('ERROR: no url', 'Источник: '.$this->array_last($this->parentUrl).'; Адрес: '.($url?$url:'нет').';'); return false; }		// получаем домен
+				if(!preg_match("|^([^/]*//[^/]+)|i",$this->array_last($this->parentUrl), $match)) { $this->log('ERROR: no url', 'РСЃС‚РѕС‡РЅРёРє: '.$this->array_last($this->parentUrl).'; РђРґСЂРµСЃ: '.($url?$url:'РЅРµС‚').';'); return false; }		// РїРѕР»СѓС‡Р°РµРј РґРѕРјРµРЅ
 				
 				return $match[0].'/'.$url;
 			} 
@@ -506,9 +506,9 @@ class Cache {
 				return $this->domen.'/'.$url;
 			} 
 		}
-		elseif(preg_match("|^\.\.|",$url)) {								# путь относительно папки								../im/m.png
+		elseif(preg_match("|^\.\.|",$url)) {								# РїСѓС‚СЊ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РїР°РїРєРё								../im/m.png
 				
-			// кол-во многоточий
+			// РєРѕР»-РІРѕ РјРЅРѕРіРѕС‚РѕС‡РёР№
 			$arr_url = explode('/',$url);
 			
 			$level = '/[^/]*';
@@ -517,24 +517,24 @@ class Cache {
 			return preg_replace("|".$level."$|","/",$this->array_last($this->parentUrl)).str_replace("../",'',$url);
 		}
 		
-		// не знаем как преобразовать данный адрес, записываем в лог файл
-		if(count($this->parentUrl)) $this->log('ERROR: no url', 'Источник: '.$this->array_last($this->parentUrl).'; Адрес: '.($url?$url:'нет').';');
-		else $this->log('ERROR: no url', 'Источник: '.$this->name.'; Тег: '.$this->lastTag.'; Адрес: '.($url?$url:'нет').';');
+		// РЅРµ Р·РЅР°РµРј РєР°Рє РїСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ РґР°РЅРЅС‹Р№ Р°РґСЂРµСЃ, Р·Р°РїРёСЃС‹РІР°РµРј РІ Р»РѕРі С„Р°Р№Р»
+		if(count($this->parentUrl)) $this->log('ERROR: no url', 'РСЃС‚РѕС‡РЅРёРє: '.$this->array_last($this->parentUrl).'; РђРґСЂРµСЃ: '.($url?$url:'РЅРµС‚').';');
+		else $this->log('ERROR: no url', 'РСЃС‚РѕС‡РЅРёРє: '.$this->name.'; РўРµРі: '.$this->lastTag.'; РђРґСЂРµСЃ: '.($url?$url:'РЅРµС‚').';');
 		
 		return false;
 	}
 	
 	/**
-	* Возвращает значение последнего элемента массива
+	* Р’РѕР·РІСЂР°С‰Р°РµС‚ Р·РЅР°С‡РµРЅРёРµ РїРѕСЃР»РµРґРЅРµРіРѕ СЌР»РµРјРµРЅС‚Р° РјР°СЃСЃРёРІР°
 	* 
-	* @param array массив
+	* @param array РјР°СЃСЃРёРІ
 	*/
 	private function array_last($arr) {
 		return $arr[count($arr)-1];
 	}
 	
 	/**
-	* Удаление узла из DOM
+	* РЈРґР°Р»РµРЅРёРµ СѓР·Р»Р° РёР· DOM
 	* 
 	* @param mixed $node
 	*/
@@ -546,7 +546,7 @@ class Cache {
 	
 	
 	/**
-	* Рекурсивное удаление всех детей из DOM
+	* Р РµРєСѓСЂСЃРёРІРЅРѕРµ СѓРґР°Р»РµРЅРёРµ РІСЃРµС… РґРµС‚РµР№ РёР· DOM
 	* 
 	* @param mixed $node
 	*/
@@ -558,11 +558,10 @@ class Cache {
 	}	
 	
 	
-	
 	/**
-	* Получить расширение файла по его заголовку
+	* РџРѕР»СѓС‡РёС‚СЊ СЂР°СЃС€РёСЂРµРЅРёРµ С„Р°Р№Р»Р° РїРѕ РµРіРѕ Р·Р°РіРѕР»РѕРІРєСѓ
 	* 
-	* @param string заголовок
+	* @param string Р·Р°РіРѕР»РѕРІРѕРє
 	*/
 	private function getExt($type, $url) {
 		$arr_type = explode(';', strtolower($type));
@@ -599,17 +598,17 @@ class Cache {
 	
 	
 	/**
-	* Подключение к ресурсу и получение его содержимого
+	* РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє СЂРµСЃСѓСЂСЃСѓ Рё РїРѕР»СѓС‡РµРЅРёРµ РµРіРѕ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ
 	* 
-	* @param string путь до ресурса
-	* @return array(список заголовков, тело ресурса)
+	* @param string РїСѓС‚СЊ РґРѕ СЂРµСЃСѓСЂСЃР°
+	* @return array(СЃРїРёСЃРѕРє Р·Р°РіРѕР»РѕРІРєРѕРІ, С‚РµР»Рѕ СЂРµСЃСѓСЂСЃР°)
 	*/
 	private function connect($url) {
 		
 		$options = array(
 			  CURLOPT_SSL_VERIFYPEER => false
 			, CURLOPT_URL => $url					# return web page
-			, CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_0 # используем старую версию протокола, чтобы правильно разбивать заголовки
+			, CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_0 # РёСЃРїРѕР»СЊР·СѓРµРј СЃС‚Р°СЂСѓСЋ РІРµСЂСЃРёСЋ РїСЂРѕС‚РѕРєРѕР»Р°, С‡С‚РѕР±С‹ РїСЂР°РІРёР»СЊРЅРѕ СЂР°Р·Р±РёРІР°С‚СЊ Р·Р°РіРѕР»РѕРІРєРё
 			, CURLOPT_RETURNTRANSFER => true		# return web page
 			, CURLOPT_HEADER         => true		# don't return headers
 			, CURLOPT_FOLLOWLOCATION => true		# follow redirects
@@ -622,24 +621,24 @@ class Cache {
 		);
 		
 		
-		$ch = curl_init();							# инициализируем отдельное соединение (поток)
-		curl_setopt_array( $ch, $options );			# применяем параметры запроса
-		$page = curl_exec($ch); 					# выполняем запрос
-		$info = curl_getinfo($ch);					# информация об ответе
-		$info['error_num'] = curl_errno($ch);		# код ошибки
-		$info['error_txt'] = curl_error($ch);		# текст ошибки
-		curl_close($ch);							# закрытие потока
+		$ch = curl_init();							# РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РѕС‚РґРµР»СЊРЅРѕРµ СЃРѕРµРґРёРЅРµРЅРёРµ (РїРѕС‚РѕРє)
+		curl_setopt_array( $ch, $options );			# РїСЂРёРјРµРЅСЏРµРј РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїСЂРѕСЃР°
+		$page = curl_exec($ch); 					# РІС‹РїРѕР»РЅСЏРµРј Р·Р°РїСЂРѕСЃ
+		$info = curl_getinfo($ch);					# РёРЅС„РѕСЂРјР°С†РёСЏ РѕР± РѕС‚РІРµС‚Рµ
+		$info['error_num'] = curl_errno($ch);		# РєРѕРґ РѕС€РёР±РєРё
+		$info['error_txt'] = curl_error($ch);		# С‚РµРєСЃС‚ РѕС€РёР±РєРё
+		curl_close($ch);							# Р·Р°РєСЂС‹С‚РёРµ РїРѕС‚РѕРєР°
 		
 		
-		if(!$this->connect_error($url,$info)) return array();	# проверяем соединение на ошибки
+		if(!$this->connect_error($url,$info)) return array();	# РїСЂРѕРІРµСЂСЏРµРј СЃРѕРµРґРёРЅРµРЅРёРµ РЅР° РѕС€РёР±РєРё
 		
 		
-		$header = substr($page, 0, $info['header_size']);	# отделяем заголовки от контента
-		$header = explode("\r\n\r\n", $header);				# разбиваем заголовки по блокам
-		$header = $header[$info['redirect_count']];			# оставляем последний блок заголовков
-		$header = explode("\r\n", $header);					# получаем список заголовков
+		$header = substr($page, 0, $info['header_size']);	# РѕС‚РґРµР»СЏРµРј Р·Р°РіРѕР»РѕРІРєРё РѕС‚ РєРѕРЅС‚РµРЅС‚Р°
+		$header = explode("\r\n\r\n", $header);				# СЂР°Р·Р±РёРІР°РµРј Р·Р°РіРѕР»РѕРІРєРё РїРѕ Р±Р»РѕРєР°Рј
+		$header = $header[$info['redirect_count']];			# РѕСЃС‚Р°РІР»СЏРµРј РїРѕСЃР»РµРґРЅРёР№ Р±Р»РѕРє Р·Р°РіРѕР»РѕРІРєРѕРІ
+		$header = explode("\r\n", $header);					# РїРѕР»СѓС‡Р°РµРј СЃРїРёСЃРѕРє Р·Р°РіРѕР»РѕРІРєРѕРІ
 		
-		$body = substr($page, $info['header_size']);		# контент
+		$body = substr($page, $info['header_size']);		# РєРѕРЅС‚РµРЅС‚
 		
 		
 		return array($header, $body, $info['content_type']);
@@ -647,29 +646,29 @@ class Cache {
 	
 	
 	/**
-	* Протолирование ошибок соединения
+	* РџСЂРѕС‚РѕР»РёСЂРѕРІР°РЅРёРµ РѕС€РёР±РѕРє СЃРѕРµРґРёРЅРµРЅРёСЏ
 	* 
-	* @param string путь до ресурса
-	* @param array информация о соединении
+	* @param string РїСѓС‚СЊ РґРѕ СЂРµСЃСѓСЂСЃР°
+	* @param array РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРѕРµРґРёРЅРµРЅРёРё
 	*/
 	private function connect_error($url,$info) {
 		
-		// Коды ответа
+		// РљРѕРґС‹ РѕС‚РІРµС‚Р°
 		switch($info['http_code']) {
 			
-			# Страница не найдена
+			# РЎС‚СЂР°РЅРёС†Р° РЅРµ РЅР°Р№РґРµРЅР°
 			case 404: 
-				$this->log('ERROR: curl, '.$info['http_code'].': Страница не найдена', $url);
+				$this->log('ERROR: curl, '.$info['http_code'].': РЎС‚СЂР°РЅРёС†Р° РЅРµ РЅР°Р№РґРµРЅР°', $url);
 				return false;
 			break;
 			
-			# Неправильный путь
+			# РќРµРїСЂР°РІРёР»СЊРЅС‹Р№ РїСѓС‚СЊ
 			case 512: 
 				$this->log('ERROR: curl, '.$info['http_code'].': Bad Gateway', $url);
 				return false;
 			break;
 			
-			# Проверяем на ошибки
+			# РџСЂРѕРІРµСЂСЏРµРј РЅР° РѕС€РёР±РєРё
 			default:
 				if(!$info['error_num']) return true;
 				$this->log('ERROR: curl, '.$info['error_num'].': '.$info['error_txt'], $url);
@@ -682,19 +681,19 @@ class Cache {
 	
 	
 	/**
-	* Логирование
+	* Р›РѕРіРёСЂРѕРІР°РЅРёРµ
 	* 
-	* @param string тип лога
-	* @param string значение
+	* @param string С‚РёРї Р»РѕРіР°
+	* @param string Р·РЅР°С‡РµРЅРёРµ
 	*/
 	private function log( $type, $value ) {
 		
-		// нужно ли логирование
+		// РЅСѓР¶РЅРѕ Р»Рё Р»РѕРіРёСЂРѕРІР°РЅРёРµ
 		if(!$this->log) return false;
 		
 		$log = date("Y-m-d H:i:s").' - '.$type.' - '.$value."\r\n";
 		
-		// Открываем файл
+		// РћС‚РєСЂС‹РІР°РµРј С„Р°Р№Р»
 		$d = fopen(getenv("DOCUMENT_ROOT").'/'.$this->log_path,"a+");
 		
 		if(!$d) return false;
@@ -708,16 +707,16 @@ class Cache {
 	
 	
 	/**
-	* Сообщения
+	* РЎРѕРѕР±С‰РµРЅРёСЏ
 	* 
 	* @param mixed $num
 	*/
 	private function message( $num ) {
 		switch($num) {
-			case 0: return "Кэш уже существует";
-			case 1: return "Неправильное имя для кэша";
-			case 2: return "Не удалось определить домен кэшируемой страницы";
-			default: return "Неизвестная ошибка";
+			case 0: return "РљСЌС€ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚";
+			case 1: return "РќРµРїСЂР°РІРёР»СЊРЅРѕРµ РёРјСЏ РґР»СЏ РєСЌС€Р°";
+			case 2: return "РќРµ СѓРґР°Р»РѕСЃСЊ РѕРїСЂРµРґРµР»РёС‚СЊ РґРѕРјРµРЅ РєСЌС€РёСЂСѓРµРјРѕР№ СЃС‚СЂР°РЅРёС†С‹";
+			default: return "РќРµРёР·РІРµСЃС‚РЅР°СЏ РѕС€РёР±РєР°";
 		}
 	}
 }
